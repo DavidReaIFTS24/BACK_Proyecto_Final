@@ -159,6 +159,36 @@ class UsuarioController {
       next(error);
     }
   }
+  // --- 5. Crear Nuevo Usuario (POST /api/usuarios) --- [NUEVO]
+  /**
+   * ✅ NUEVO: Permite a un admin crear un usuario directamente desde el panel.
+   * Requiere: nombre, email, password, rol.
+   */
+  static async crear(req, res, next) {
+    try {
+      console.log('==========================================');
+      console.log('🚀 REQUEST: POST /api/usuarios');
+      console.log('📦 Body recibido:', JSON.stringify({ ...req.body, password: '***' }));
+
+      const usuario = await UsuarioService.registrarUsuario(req.body);
+
+      console.log('✅ RESPUESTA EXITOSA: Usuario creado por admin');
+      console.log('==========================================\n');
+
+      res.status(201).json({
+        success: true,
+        message: 'Usuario creado exitosamente',
+        data: usuario
+      });
+    } catch (error) {
+      console.log('❌ ERROR:', error.message);
+      console.log('==========================================\n');
+      if (error.message === 'El email ya está registrado') {
+        return res.status(400).json({ success: false, message: error.message });
+      }
+      next(error);
+    }
+  }
 }
 
 // Exporta el controlador para ser utilizado por el router

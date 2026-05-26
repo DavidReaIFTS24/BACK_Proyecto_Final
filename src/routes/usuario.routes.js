@@ -20,7 +20,8 @@ router.use(verificarToken);
 router.use(esAdmin);
 
 // --- Definición de Rutas CRUD para Usuarios (Solo Admin) ---
-
+// ✅ NUEVO: POST /api/usuarios — Crear usuario desde el panel admin
+router.post('/', UsuarioController.crear);
 // GET /api/usuarios/
 // Ruta para obtener la lista de todos los usuarios.
 router.get('/', UsuarioController.obtenerTodos);
