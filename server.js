@@ -1,91 +1,70 @@
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
+const cors    = require('cors');
 const { errorHandler, notFound } = require('./src/middlewares/error.middleware');
 
-// Importar rutas
-const authRoutes = require('./src/routes/auth.routes');
-const usuarioRoutes = require('./src/routes/usuario.routes');
+// ── Rutas ────────────────────────────────────────────────────────────────────
+const authRoutes      = require('./src/routes/auth.routes');
+const usuarioRoutes   = require('./src/routes/usuario.routes');
 const categoriaRoutes = require('./src/routes/categoria.routes');
-const productoRoutes = require('./src/routes/producto.routes');
-const clienteRoutes = require('./src/routes/cliente.routes');
-const stockRoutes = require('./src/routes/stock.routes');
-const pedidoRoutes = require('./src/routes/pedido.routes');
+const productoRoutes  = require('./src/routes/producto.routes');
+const clienteRoutes   = require('./src/routes/cliente.routes');
+const stockRoutes     = require('./src/routes/stock.routes');
+const pedidoRoutes    = require('./src/routes/pedido.routes');
+const imagenRoutes    = require('./src/routes/imagen.routes'); // ← NUEVO
 
-// Inicializar Firebase
+// ── Firebase ──────────────────────────────────────────────────────────────────
 require('./config/firebase');
 
-// Crear aplicación Express
+// ── Cloudinary ────────────────────────────────────────────────────────────────
+require('./config/cloudinary'); // ← NUEVO — inicializa la configuración al arrancar
+
+// ── App ───────────────────────────────────────────────────────────────────────
 const app = express();
 
-// ============================================
-// MIDDLEWARES GLOBALES
-// ============================================
-
-// CORS - Permitir peticiones desde cualquier origen
 app.use(cors());
-
-// Parser de JSON
 app.use(express.json());
-
-// Parser de datos URL encoded
 app.use(express.urlencoded({ extended: true }));
 
-// Logging de peticiones
 app.use((req, res, next) => {
-  const timestamp = new Date().toISOString();
-  console.log(`\n[${timestamp}] ${req.method} ${req.url}`);
+  console.log(`\n[${new Date().toISOString()}] ${req.method} ${req.url}`);
   next();
 });
 
-// ============================================
-// RUTA PRINCIPAL
-// ============================================
-
+// ── Ruta raíz ─────────────────────────────────────────────────────────────────
 app.get('/', (req, res) => {
   res.json({
     success: true,
     message: 'API Marroquinería Magnum',
     version: '1.0.0',
     endpoints: {
-      auth: '/api/auth',
-      usuarios: '/api/usuarios',
-      categorias: '/api/categorias',
+      auth:      '/api/auth',
+      usuarios:  '/api/usuarios',
+      categorias:'/api/categorias',
       productos: '/api/productos',
-      clientes: '/api/clientes',
-      stock: '/api/stock',
-      pedidos: '/api/pedidos'
+      clientes:  '/api/clientes',
+      stock:     '/api/stock',
+      pedidos:   '/api/pedidos',
+      imagenes:  '/api/imagenes', // ← NUEVO
     },
-    documentation: 'Ver README.md para documentación completa'
   });
 });
 
-// ============================================
-// RUTAS DE LA API
-// ============================================
-
-app.use('/api/auth', authRoutes);
-app.use('/api/usuarios', usuarioRoutes);
+// ── API ───────────────────────────────────────────────────────────────────────
+app.use('/api/auth',       authRoutes);
+app.use('/api/usuarios',   usuarioRoutes);
 app.use('/api/categorias', categoriaRoutes);
-app.use('/api/productos', productoRoutes);
-app.use('/api/clientes', clienteRoutes);
-app.use('/api/stock', stockRoutes);
-app.use('/api/pedidos', pedidoRoutes);
+app.use('/api/productos',  productoRoutes);
+app.use('/api/clientes',   clienteRoutes);
+app.use('/api/stock',      stockRoutes);
+app.use('/api/pedidos',    pedidoRoutes);
+app.use('/api/imagenes',   imagenRoutes); // ← NUEVO
 
-// ============================================
-// MANEJO DE ERRORES
-// ============================================
-
-// Ruta no encontrada
+// ── Errores ───────────────────────────────────────────────────────────────────
 app.use(notFound);
-
-// Manejador global de errores
 app.use(errorHandler);
 
-// ============================================
-// INICIAR SERVIDOR
-// ============================================
-
+// ── Servidor ──────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
@@ -107,10 +86,11 @@ app.listen(PORT, () => {
   console.log('   GET    /api/clientes');
   console.log('   GET    /api/stock');
   console.log('   GET    /api/pedidos');
+  console.log('   POST   /api/imagenes/upload');  // ← NUEVO
+  console.log('   DELETE /api/imagenes/:publicId'); // ← NUEVO
   console.log('════════════════════════════════════════════════\n');
 });
 
-// Manejo de errores no capturados
 process.on('unhandledRejection', (err) => {
   console.error('❌ ERROR NO MANEJADO:', err);
   process.exit(1);
