@@ -22,11 +22,7 @@ class ProductoService {
     return producto;
   }
 
-  /**
-   * ✅ FIX: obtenerTodos ahora incluye el stock de cada producto.
-   * Antes devolvía los productos sin el campo `stock`, lo que causaba
-   * que la tabla de ProductosPage mostrara "—" en la columna Stock.
-   */
+
   static async obtenerTodos() {
     console.log('📋 Servicio: Obteniendo todos los productos con stock...');
     const productos = await ProductoModel.obtenerTodos();
@@ -79,10 +75,18 @@ class ProductoService {
 
   static async eliminar(id) {
     console.log(`🗑️ Servicio: Eliminando producto ${id}...`);
+
+    const stock = await StockModel.obtenerPorProducto(id);
+    if (stock) {
+      await StockModel.eliminar(stock.id);
+      console.log(`🗑️ Stock asociado eliminado para producto: ${id}`);
+    }
+
     const resultado = await ProductoModel.eliminar(id);
     if (!resultado) {
       throw new Error('Producto no encontrado');
     }
+
     console.log(`✅ Producto eliminado: ${id}`);
     return resultado;
   }
