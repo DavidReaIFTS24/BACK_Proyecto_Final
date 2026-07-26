@@ -253,7 +253,46 @@ class StockController {
     }
   }
 
-  // --- 8. Eliminar Registro de Stock (DELETE /api/stock/:id) ---
+  // --- 8. Descontar Stock (Transaccional) (PUT /api/stock/descontar/:productoId) ---
+
+  /**
+   * Maneja la petición para descontar la cantidad de stock de un producto específico.
+   * Útil para registrar salidas de inventario o ventas manuales.
+   */
+  static async descontarStock(req, res, next) {
+    try {
+      console.log('==========================================');
+      console.log(`🚀 REQUEST: PUT /api/stock/descontar/${req.params.productoId}`);
+      console.log('📦 Body recibido:', JSON.stringify(req.body, null, 2));
+
+      const { cantidad } = req.body;
+
+      if (!cantidad || cantidad <= 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'La cantidad a descontar debe ser un número entero mayor a 0'
+        });
+      }
+
+      const resultado = await StockService.descontarStock(req.params.productoId, cantidad);
+
+      console.log('✅ RESPUESTA EXITOSA: Stock descontado');
+      console.log('==========================================\n');
+
+      res.json({
+        success: true,
+        message: 'Stock descontado exitosamente',
+        data: resultado
+      });
+
+    } catch (error) {
+      console.log('❌ ERROR:', error.message);
+      console.log('==========================================\n');
+      next(error);
+    }
+  }
+
+  // --- 9. Eliminar Registro de Stock (DELETE /api/stock/:id) ---
 
   /**
    * Maneja la petición para eliminar un registro de stock.

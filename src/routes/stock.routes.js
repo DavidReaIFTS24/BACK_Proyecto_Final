@@ -26,6 +26,9 @@ router.post('/', verificarToken, esAdminOEmpleado, StockController.crear);
 // PUT /api/stock/aumentar/:productoId  ← ANTES de /:id
 router.put('/aumentar/:productoId', verificarToken, esAdminOEmpleado, StockController.aumentarStock);
 
+// PUT /api/stock/descontar/:productoId  ← ANTES de /:id
+router.put('/descontar/:productoId', verificarToken, esAdminOEmpleado, StockController.descontarStock);
+
 // PUT /api/stock/:id  ← AL FINAL de los PUTs
 router.put('/:id', verificarToken, esAdminOEmpleado, StockController.actualizar);
 
