@@ -1,18 +1,21 @@
 const admin = require('firebase-admin');
 const path = require('path');
 
-// Cargar credenciales de Firebase
-const serviceAccount = require(path.join(__dirname, 'firebase-key.json'));
+let serviceAccount;
 
-// Inicializar Firebase Admin
+if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+  // Producción (Render): la key viene como variable de entorno en formato JSON
+  serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+} else {
+  // Desarrollo local: se lee el archivo físico
+  serviceAccount = require(path.join(__dirname, 'firebase-key.json'));
+}
+
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 
-// Obtener referencia a Firestore
 const db = admin.firestore();
-
-// Configuración regional (opcional pero recomendado)
 db.settings({ ignoreUndefinedProperties: true });
 
 console.log('🔥 Firebase inicializado correctamente');
